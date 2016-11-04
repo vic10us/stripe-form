@@ -1,0 +1,95 @@
+<!--
+@license
+Copyright (c) 2016 DEXS Inc. All rights reserved.
+This code may only be used under the MIT style license found at LICENSE.md
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+`DEXS.StripeBehavior`
+Behavior wrapper for the Stripe library
+-->
+<script>
+  window.DEXS = window.DEXS || {};
+  /** @polymerBehavior DEXS.StripeBehavior */
+  DEXS.StripeBehavior = {
+
+    properties: {
+      Stripe: {
+        type: Object,
+      },
+
+      publishableKey: {
+        type: String,
+        notify: true,
+        observer: '_publishableKeyChanged'
+      },
+
+      validationResult: {
+        type: String,
+        notify: true
+      }
+
+    },
+
+    _publishableKeyChanged: function(newValue, oldValue) {
+      if (!!this.Stripe && !!newValue) {
+        this.Stripe.setPublishableKey(newValue);
+      }
+    },
+
+    _initStripe: function() {
+      if (!!!this.Stripe)
+        this.Stripe = Stripe;
+      if (!!!this.Stripe.key)
+        this.Stripe.setPublishableKey(this.publishableKey);
+    },
+
+    _stripeExists: function() {
+      return typeof Stripe != 'undefined';
+    },
+
+    _loadStripe: function() {
+      if(this._stripeExists()) {
+        this._initStripe();
+        return;
+      }
+
+      var script = document.createElement('script');
+      script.src = 'https://js.stripe.com/v2/';
+      document.body.appendChild(script);
+      script.onload = this._initStripe.bind(this);
+    },
+
+    _stripeResponseHandler: function(status, response) {
+      if (response.error) {
+        if (this.debug) console.log(response.error);
+        this.validationResult = response.error.message;
+        this.fire('stripe-card-validation-failed', { error: response.error, response: response } );
+        return;
+      }
+      if (this.debug) console.log(response.id);
+      this.fire('stripe-card-validation-succeeded', { token: response.id, response: response });
+      this.validationResult = response;
+    },
+
+    validate: function(e, detail) {
+      try {
+      this.Stripe.card.createToken({
+        name: this.fullName || '',
+        number: this.creditCard,
+        cvc: this.cvc,
+        exp: this.expiryDate
+      }, this._stripeResponseHandler.bind(this));
+      } catch (error) {
+        this.fire('stripe-card-validation-failed', { message: 'An exception occurred', exception: error });
+      }
+    },
+
+    created: function() {
+      this._loadStripe();
+    },
+
+  };
+</script>

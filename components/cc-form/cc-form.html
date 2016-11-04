@@ -1,0 +1,204 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../gold-cc-expiration-input/gold-cc-expiration-input.html">
+<link rel="import" href="../gold-cc-cvc-input/gold-cc-cvc-input.html">
+<link rel="import" href="../gold-cc-input/gold-cc-input.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="cc-form-behavior.html">
+<link rel="import" href="cc-styles.html">
+
+<!--
+An element providing a cool credit card form with validation and Card Preview
+
+Example:
+
+    <cc-form></cc-form>
+
+@demo
+-->
+
+<dom-module id="cc-form">
+  <style is="custom-style" include="cc-styles iron-flex iron-flex-reverse">
+    :host {
+      display: block;
+      box-sizing: border-box;
+    }
+    .top > .cc-card-container {
+      padding-bottom: 10px;
+    }
+    .bottom > .cc-card-container {
+      padding-top: 20px;
+    }
+    .hidden > .cc-card-container {
+      padding: 0px;
+      display: none;
+      visibility: hidden;
+    }
+    .spacer {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+    gold-cc-expiration-input {
+      width: 100px;
+    }
+    @media only screen and (max-width: 400px) {
+      .cc-card-container {
+          display: none;
+          visibility: hidden;
+      }
+    }
+  </style>
+  
+  <template>
+    <div class$="cc-form-container layout {{_layoutClass(previewPosition)}}">
+      <div class="cc-card-container">
+        <div class$="cc-card {{_ccClass(cardType,_showBack)}}">
+          <div class="cc-card-front">
+            <div hidden$="{{!_hasCardType(cardType)}}" class$="cc-card-logo cc-card-{{cardType}}"></div>
+            <div class="cc-card-lower">
+              <div class="cc-card-shiny"></div>
+              <div class$="cc-card-cvc cc-card-display {{_conditionalFocusedClass(_cardCvcFocused)}}"><span>{{cvc}}</span></div>
+              <div class$="cc-card-number cc-card-display {{_conditionalFocusedClass(_cardNumberFocused)}}"><span>{{creditCard}}</span></div>
+              <div class$="cc-card-name cc-card-display {{_conditionalFocusedClass(_cardNameFocused)}}"><span>{{fullName}}</span></div>
+              <div class$="cc-card-expiry cc-card-display {{_conditionalFocusedClass(_cardExpiryFocused)}}" data-before="month/year" data-after="validthru">{{expiryDate}}</div>
+            </div>
+          </div>
+          <div class="cc-card-back">
+            <div class="cc-card-bar"></div>
+            <div class$="cc-card-cvc cc-card-display {{_conditionalFocusedClass(_cardCvcFocused)}}">{{cvc}}</div>
+            <div class="cc-card-shiny"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="input-container">
+        <paper-input id="creditCardFullName" 
+                    name="creditCardFullName" 
+                    auto-validate="[[autoValidate]]" 
+                    required 
+                    value="{{fullName}}" 
+                    label="Cardholder Name"
+                    focused="{{_cardNameFocused}}"></paper-input>
+        <gold-cc-input id="creditCardNumber" 
+                    auto-validate="[[autoValidate]]"
+                    name="creditCardNumber" 
+                    required 
+                    value="{{creditCard}}" 
+                    card-type="{{cardType}}" 
+                    label="Card Number" 
+                    focused="{{_cardNumberFocused}}"></gold-cc-input>
+        <div class="layout horizontal">
+          <gold-cc-expiration-input id="creditCardExpiryDate" 
+                    name="creditCardExpiryDate" 
+                    auto-validate="[[autoValidate]]" 
+                    required 
+                    value="{{expiryDate}}" 
+                    label="Expiry" 
+                    focused="{{_cardExpiryFocused}}"></gold-cc-expiration-input>
+          <div class="spacer"></div>
+          <gold-cc-cvc-input id="creditCardCvc" 
+                    name="creditCardCvc" 
+                    auto-validate="[[autoValidate]]" 
+                    required 
+                    card-type="[[cardType]]" 
+                    focused="{{_cardCvcFocused}}" 
+                    value="{{cvc}}"></gold-cc-cvc-input>
+        </div>
+      </div>
+    </div>
+  </template>
+  
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'cc-form',
+    behaviors: [DEXS.CreditCardFormBehavior],
+
+    properties: {
+      version: {
+        type: String,
+        value: 'v1.0.12'
+      },
+      _showBack: {
+        type: Boolean,
+        value: false,
+        readonly: true
+      },
+      _cardCvcFocused: {
+        type: Boolean,
+        value: false,
+        readonly: true
+      },
+      _cardNumberFocused: {
+        type: Boolean,
+        value: false,
+        readonly: true
+      },
+      _cardNameFocused: {
+        type: Boolean,
+        value: false,
+        readonly: true
+      },
+      _cardExpiryFocused: {
+        type: Boolean,
+        value: false,
+        readonly: true
+      }
+    },
+    _conditionalFocusedClass: function(focused) {
+      return focused ? 'cc-card-focused' : '';
+    },
+    _layoutClass: function(position) {
+      return position === 'none' ? ' vertical hidden' : 
+              position === 'top' ? 'vertical top' : 'vertical-reverse bottom'; 
+    },
+    _ccClass: function(cardType, showBack) {
+      var classes;
+      if (!!cardType) {
+        classes = 'cc-card-identified cc-card-' + cardType;
+      }
+      if (!!showBack) {
+        classes += ' cc-card-flipped';
+      }
+      this._debug({cardType, showBack});
+      return classes;
+    },
+    _cardValid: function(card) {
+      var cc = CreditCardValidator.validate(card);
+      if (cc.valid) {
+        this.cardType = cc.card_type.name;
+      } else {
+        this.cardType = '';
+      }
+    },
+    _hasCardType: function(cardType) {
+      return !!this.cardType;
+    },
+    _cardCvcFocusedChanged: function(n) {
+      this._showBack = n;
+      this._debug('cvc is' + (n ? ' ' : ' not ') + 'focused');
+    },
+    observers: [
+      '_cardCvcFocusedChanged(_cardCvcFocused)',
+      '_cardValid(creditCard)'
+    ],
+    ready: function() {
+       this._debug('cc-form ready');
+    },
+    attached: function() {
+      this._debug('cc-form attached');
+      if (this.cardType !== '') {
+        this._debug('The card type was provided.');
+        this.$.creditCardNumber.validate();
+      }
+    },
+    detached: function() {
+       this._debug('cc-form detached');
+    },
+
+  });
+
+</script>

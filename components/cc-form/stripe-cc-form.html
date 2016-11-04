@@ -1,0 +1,51 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="stripe-behavior.html">
+<link rel="import" href="cc-form-behavior.html">
+<link rel="import" href="cc-form.html">
+
+<!--
+An element providing a cool credit card form with validation and Card Preview
+
+Example:
+
+    <stripe-cc-form></stripe-cc-form>
+
+@demo demo/stripe.html
+-->
+
+<dom-module id="stripe-cc-form">
+  
+  <style is="custom-style" include="iron-flex iron-flex-reverse">
+    :host {
+      display: block;
+      box-sizing: border-box;
+    }
+  </style>
+  
+  <template>
+      <cc-form 
+        cvc="{{cvc}}" 
+        debug$="{{debug}}"
+        auto-validate$="{{autoValidate}}"
+        credit-card="{{creditCard}}"
+        card-type="{{cardType}}"
+        full-name="{{fullName}}"
+        expiry-date="{{expiryDate}}"
+        preview-position="{{previewPosition}}"></cc-form>
+  </template>
+  
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'stripe-cc-form',
+    behaviors: [DEXS.StripeBehavior, DEXS.CreditCardFormBehavior],
+
+    properties: {
+    },
+
+  });
+
+</script>

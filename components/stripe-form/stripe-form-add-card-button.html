@@ -1,0 +1,64 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../neon-animation/neon-shared-element-animatable-behavior.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../paper-styles/typography.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+
+<!--
+`stripe-form-add-card-button`
+
+@demo demo/stripe-form-add-card-button-demo.html 
+-->
+
+<dom-module id="stripe-form-add-card-button">
+	<template>
+		<style is="custom-style">
+			:host {
+				display: block;
+				white-space: nowrap;
+			}
+            iron-icon {
+                height: 16px;
+            }
+		</style>
+		
+        <paper-button raised on-tap="_addCard"><iron-icon icon="icons:credit-card"></iron-icon>Add Card</paper-button>
+
+	</template>
+	<script>
+        Polymer({
+            is: 'stripe-form-add-card-button',
+
+            behaviors: [
+                Polymer.NeonSharedElementAnimatableBehavior
+            ],
+
+            properties: {
+                sharedElements: {
+                    type: Object,
+                    value: function() {
+                        return {
+                            'hero': this
+                        }
+                    }
+                },
+                animationConfig: {
+                    type: Object,
+                    value: function() {
+                        return {
+                            'exit': {
+                                name: 'hero-animation',
+                                id: 'hero',
+                                fromPage: this
+                            }
+                        };
+                    }
+                }
+            },
+
+            _addCard: function(e) {
+                this.fire('tap', { event: e, source: this });
+            }
+        });
+    </script>
+</dom-module>

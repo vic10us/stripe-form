@@ -1,0 +1,271 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../cc-form/stripe-cc-form.html">
+<link rel="import" href="../cc-form/stripe-behavior.html">
+<link rel="import" href="../cc-form/cc-form-behavior.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../neon-animation/animations/hero-animation.html">
+<link rel="import" href="../neon-animation/animations/fade-out-animation.html">
+<link rel="import" href="../neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../neon-animation/animations/fade-in-animation.html">
+<link rel="import" href="../neon-animation/neon-animation-runner-behavior.html">
+<link rel="import" href="../neon-animation/animations/slide-from-top-animation.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../paper-styles/typography.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="stripe-card-preview.html">
+<link rel="import" href="stripe-form-add-card-button.html">
+
+<!--
+`stripe-form`
+
+@demo demo/stripe-form-demo.html 
+-->
+
+<dom-module id="stripe-form">
+  <template>
+    <style is="custom-style">
+      :host {
+        display: block;
+        white-space: nowrap;
+      }
+
+      paper-dialog.size-position {
+        width: 400px;
+        top: 0px;
+        overflow: auto;
+        border-radius: 5px;
+      }
+
+      .card-error-message {
+        @apply(--paper-font-body2);
+        color: var(--paper-red-50);
+        background: var(--paper-red-500);
+        border-bottom: solid 1px black;
+        margin: 0;
+        padding: 5px;
+      }
+
+    </style>
+    
+    <stripe-form-add-card-button hidden$="{{_hasCard}}" id="addCardButton" on-tap="openDialog"></stripe-form-add-card-button>
+
+    <paper-dialog id="cardDialog" class="size-position" with-backdrop>
+      <div hidden$="{{!_hasErrorMessage}}" class="card-error-message flex">{{errorMessage}}</div>
+      <stripe-cc-form id="ccForm" publishable-key="{{stripePublishableKey}}"></stripe-cc-form>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button on-tap="_addCard" autofocus>Add</paper-button>
+      </div>
+    </paper-dialog>
+
+    <stripe-card-preview 
+      id="cardPreview"
+      hidden$="{{!_hasCard}}"
+      card-type="[[cardType]]" 
+      last-four="[[lastFour]]"
+      expiry-month="[[expiryMonth]]"
+      expiry-year="[[expiryYear]]"
+      on-stripe-card-preview-removed="_removeCard"></stripe-card-preview>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'stripe-form',
+
+      behaviors: [
+        DEXS.CreditCardFormBehavior,
+        Polymer.NeonAnimationRunnerBehavior
+      ],
+
+      properties: {
+        lastFour: {
+          type: String,
+          value: '',
+          notify: true
+        },
+        stripePublishableKey: {
+          type: String,
+          value: '',
+          notify: true
+        },
+        cardType: {
+          type: String,
+          value: '_blank',
+          notify: true
+        },
+        country: {
+          type: String,
+          value: '',
+          notify: true
+        },
+        expiryMonth: {
+          type: Number,
+          notify: true
+        },
+        expiryYear: {
+          type: Number,
+          notify: true
+        },
+        cardId: {
+          type: String,
+          value: '',
+          readonly: true,
+          notify: true
+        },
+        cardToken: {
+          type: String,
+          value: '',
+          notify: true,
+          readonly: true,
+          observer: '_cardTokenChanged'
+        },
+        _hasCard: {
+          type: Boolean,
+          value: false,
+          notify: true
+        },
+        _cardAdded: {
+          type: Boolean,
+          value: false,
+          notify: true
+        },
+        _hasErrorMessage: {
+          type: Boolean,
+          value: false,
+          notify: true
+        },
+        errorMessage: {
+          type: String,
+          value: '',
+          notify: true,
+          observer: '_errorMessageChanged'
+        }
+      },
+
+      listeners: {
+        'iron-overlay-canceled': '_formCancelled',
+        'iron-overlay-closed': '_formClosed',
+        'stripe-card-validation-failed': '_formValidationFailed',
+        'stripe-card-validation-succeeded': '_formValidationSucceeded',
+      },
+
+      _getOffset: function( el ) {
+          var _x = 0;
+          var _y = 0;
+          while( el && !isNaN( el.offsetLeft ) && !isNaN( el.offsetTop ) ) {
+              _x += el.offsetLeft - el.scrollLeft;
+              _y += el.offsetTop - el.scrollTop;
+              el = el.offsetParent;
+          }
+          console.log({ top: _y, left: _x });
+          return { top: _y, left: _x };
+      },
+
+      _setupDialogAnimation: function() {
+        var dialog = this.$.cardDialog;
+        var button = this.$.addCardButton;
+        dialog.animationConfig = dialog.animationConfig || {};
+        dialog.animationConfig.entry =  [{
+            name: 'scale-up-animation',
+            node: dialog,
+            transformOrigin: '0px ' + this._getOffset(button).top + 'px',
+            timing: {
+                duration: 300
+            }
+          }, {
+            name: 'fade-in-animation',
+            node: dialog,
+            timing: {
+                delay: 10,
+                duration: 150
+            }
+          }
+        ];
+        dialog.animationConfig.exit = {
+            name: 'fade-out-animation',
+            node: dialog,
+            duration: 100
+        };
+      },
+
+      ready: function() {
+        
+      },
+
+      openDialog: function() {
+        this._setupDialogAnimation();
+        this.$.cardDialog.open();
+      },
+
+      _errorMessageChanged: function(n, o) {
+        this._hasErrorMessage = !!n;
+      },
+
+      _addCard: function(e) {
+        var f = this.$.ccForm;
+        try {
+          f.validate();
+        } catch (exp) {
+          this.errorMessage = 'A fatal error has occurred';
+        }
+      },
+
+      _removeCard: function() { 
+        this.lastFour = '';
+        this.cardType = '';
+        this.country = '';
+        this.expiryMonth = null;
+        this.expiryYear = null;
+        this.cardId = '';
+        this.cardToken = '';
+      },
+
+      _cardTokenChanged: function(n,o) {
+        this._hasCard = !!n;
+      },
+
+      _resolveCardType: function(name) {
+        var cardMap = {
+          'american express': 'amex',
+          'visa': 'visa',
+          'mastercard': 'mastercard',
+          'discover': 'discover',
+          'diners club': 'diners',
+          'jbc': 'jbc'
+        };
+        return cardMap[name] || 'unknown';
+      },
+
+      _formValidationSucceeded: function(e) {
+        var card = e.detail.response.card;
+        this.lastFour = card.last4;
+        this.cardType = this._resolveCardType(card.brand.toLowerCase());
+        this.country = card.country;
+        this.expiryMonth = card.exp_month;
+        this.expiryYear = card.exp_year;
+        this.cardId = card.id;
+        this.cardToken = e.detail.token;
+        this.$.cardDialog.close();
+      },
+
+      _formValidationFailed: function(e) {
+        if (!!e.detail.exception) { 
+          this.errorMessage = 'A fatal error has occurred';
+          console.log("Exception raised: ", e.detail.exception);
+        } else {
+          this.errorMessage = e.detail.error.message;
+        }
+      },
+
+      _formClosed: function(e) {
+        this.$.ccForm.clear();
+        this.errorMessage = undefined;
+      },
+
+      _formCancelled: function(e) {
+      }
+    });
+  </script>
+</dom-module>

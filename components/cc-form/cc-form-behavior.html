@@ -1,0 +1,99 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+`DEXS.CreditCardFormBehavior`
+Common Credit Card Form Behaviors
+-->
+<script>
+  window.DEXS = window.DEXS || {};
+  /** @polymerBehavior DEXS.CreditCardFormBehavior */
+  DEXS.CreditCardFormBehavior = {
+
+    properties: {
+      debug: {
+        type: Boolean,
+        value: false,
+        notify: true
+      },
+      /**
+       * Set to true to auto-validate the credit card input values.
+       */
+      autoValidate: {
+        type: Boolean,
+        value: false
+      },
+      /**
+       * Full name on the Credit Card 
+       */
+      fullName: {
+        type: String,
+        value: '',
+        notify: true
+      },
+      /**
+       * Credit Card number 
+       */
+      creditCard: {
+        type: String,
+        value: '',
+        notify: true
+      },
+      /**
+       * Credit Card expiry date in the format: `[MM/YY]`
+       */
+      expiryDate: {
+        type: String,
+        value: '',
+        notify: true
+      },
+      /**
+       * Credit Card Type 
+       *  Possible valid values
+       * - mastercard
+       * - visa
+       * - amex
+       * - discover 
+       */
+      cardType: {
+        type: String,
+        value: '',
+        notify: true
+      },
+      /**
+       * Credit Card CVC (Card Verification Code) 
+       */
+      cvc: {
+        type: String,
+        value: '',
+        notify: true
+      },
+      
+      /**
+       * The position of the Credit Card Preview
+       * 
+       * Possible options:
+       * - top
+       * - bottom
+       * - none
+       */
+      previewPosition: {
+        type: String,
+        value: 'top',
+        notify: true
+      }
+    },
+
+    clear: function() {
+      this.fullName = '';
+      this.creditCard = '';
+      this.expiryDate = '';
+      this.cardType = '';
+      this.cvc = '';
+    },
+
+    _debug: function(msg) {
+      if (!!this.debug) { console.log(msg); } 
+    },
+
+  };
+</script>
