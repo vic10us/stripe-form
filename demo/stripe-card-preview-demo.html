@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+  <head>
+    <title>cc-form-popup demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+
+    <link rel="import" href="../stripe-card-preview.html">
+
+    <style is="custom-style" include="demo-pages-shared-styles">
+    </style>
+  </head>
+  
+  <body>
+
+    <div class="vertical-section-container centered">
+      <h3>Basic stripe-card-preview Demo</h3>
+      <demo-snippet>
+        <template>
+          <stripe-card-preview 
+            card-type="visa" 
+            last-four="4242"
+            expiry-month="1"
+            expiry-year="2023"></stripe-card-preview>
+        </template>
+      </demo-snippet>
+    </div>
+    <script>
+      window.addEventListener('WebComponentsReady', function(e) {
+
+        var cardPreview = document.querySelector('stripe-card-preview');
+
+        cardPreview.addEventListener('stripe-card-preview-removed', function (e) {
+          alert('Card removed');
+        });
+
+      });
+    </script>
+  </body>
+</html>
