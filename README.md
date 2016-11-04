@@ -5,7 +5,7 @@
 <!--
 ```
 <custom-element-demo>
-  <template>
+  <template is="dom-bind">
     <link rel="import" href="stripe-form.html">
     <paper-input value="{{publishKey}}" label="Stripe Publishable Key"></paper-input>
     <stripe-form publishable-key="{{publishKey}}"></stripe-form>
