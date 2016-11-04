@@ -1,5 +1,21 @@
+[![Published on webcomponents.org](https://img.shields.io/badge/webcomponents.org-published-blue.svg)](https://beta.webcomponents.org/element/vic10us/stripe-form)
+
 # \<stripe-form\>
 
+<!--
+```
+<custom-element-demo>
+  <template>
+    <link rel="import" href="stripe-form.html">
+    <paper-input value="{{publishKey}}" label="Stripe Publishable Key"></paper-input>
+    <stripe-form publishable-key="{{publishKey}}"></stripe-form>
+  </template>
+</custom-element-demo>
+```
+-->
+```
+<stripe-form publishable-key="[your-stripe-publishable-key]"></stripe-form>
+```
 
 ## Install the Polymer-CLI
 
