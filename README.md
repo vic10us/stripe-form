@@ -8,13 +8,13 @@
   <template is="dom-bind">
     <link rel="import" href="stripe-form.html">
     <paper-input value="{{publishKey}}" label="Stripe Publishable Key"></paper-input>
-    <stripe-form publishable-key="{{publishKey}}"></stripe-form>
+    <stripe-form stripe-publishable-key="{{publishKey}}"></stripe-form>
   </template>
 </custom-element-demo>
 ```
 -->
 ```
-<stripe-form publishable-key="[your-stripe-publishable-key]"></stripe-form>
+<stripe-form stripe-publishable-key="[your-stripe-publishable-key]"></stripe-form>
 ```
 
 ## Install the Polymer-CLI
