@@ -300,7 +300,7 @@
       },
 
       _formValidationFailed: function(e) {
-        this._wiggle(this.$.cardDialog);
+        // this._wiggle(this.$.cardDialog);
         if (!!e.detail.exception) { 
           this.errorMessage = 'A fatal error has occurred';
           console.log("Exception raised: ", e.detail.exception);
