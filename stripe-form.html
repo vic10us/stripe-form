@@ -44,6 +44,24 @@
         margin: 0;
         padding: 5px;
       }
+      
+      paper-button.cancel {
+          background-color: #fff;
+          color: var(--paper-blue-500);
+          --paper-button-raised-keyboard-focus: {
+              background-color: var(--paper-blue-a200) !important;
+              color: white !important;
+          };
+      }
+
+      paper-button.add {
+          background-color: var(--paper-blue-500);
+          color: white;
+          --paper-button-raised-keyboard-focus: {
+              background-color: var(--paper-blue-a200) !important;
+              color: white !important;
+          };
+      }
 
     </style>
     
@@ -53,8 +71,8 @@
       <div hidden$="{{!_hasErrorMessage}}" class="card-error-message flex">{{errorMessage}}</div>
       <stripe-cc-form id="ccForm" publishable-key="{{stripePublishableKey}}"></stripe-cc-form>
       <div class="buttons">
-        <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button on-tap="_addCard" autofocus>Add</paper-button>
+        <paper-button class="cancel" dialog-dismiss>Cancel</paper-button>
+        <paper-button class="add" on-tap="_addCard" autofocus>Add</paper-button>
       </div>
     </paper-dialog>
 
@@ -250,7 +268,39 @@
         this.$.cardDialog.close();
       },
 
+      _wiggle: function(element) {
+        element.style.display = "block";
+        var x = -1;
+        var ml = element.style.marginLeft;
+        var mt = element.style.marginTop;
+        interval = setInterval(function() {
+            if(x == -1) {
+                element.style.marginLeft = '5px';
+            } else {
+                switch(x) {
+                    case 0 :
+                        element.style.marginLeft = '-5px';
+                        break;
+                    case 1 :
+                        element.style.marginLeft = '';
+                        element.style.marginTop = '5px';
+                        break;
+                    case 2 :
+                        element.style.marginTop = '-5px';
+                        break;
+                    default :
+                        element.style.marginTop = '';
+                        elemmnt.style.marginLeft = '';
+                        clearInterval(interval);
+                        break;
+                }
+            }
+            x++;
+        }, 50);
+      },
+
       _formValidationFailed: function(e) {
+        this._wiggle(this.$.cardDialog);
         if (!!e.detail.exception) { 
           this.errorMessage = 'A fatal error has occurred';
           console.log("Exception raised: ", e.detail.exception);

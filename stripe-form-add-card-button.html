@@ -20,9 +20,47 @@
             iron-icon {
                 height: 16px;
             }
+            paper-button.custom {
+                --paper-button-ink-color: var(--paper-pink-a200);
+                /* These could also be individually defined for each of the
+                specific css classes, but we'll just do it once as an example */
+                --paper-button-flat-keyboard-focus: {
+                    background-color: var(--paper-pink-a200);
+                    color: white !important;
+                };
+                --paper-button-raised-keyboard-focus: {
+                    background-color: var(--paper-pink-a200) !important;
+                    color: white !important;
+                };
+            }
+            paper-button.custom:hover {
+                background-color: var(--paper-indigo-200);
+            }
+            paper-button.pink {
+                color: var(--paper-pink-a200);
+
+            }
+            paper-button.indigo {
+                background-color: var(--paper-indigo-500);
+                color: white;
+                --paper-button-raised-keyboard-focus: {
+                background-color: var(--paper-pink-a200) !important;
+                color: white !important;
+                };
+            }
+            paper-button.green {
+                background-color: var(--paper-green-500);
+                color: white;
+            }
+            paper-button.green[active] {
+                background-color: var(--paper-red-500);
+            }
+            paper-button.disabled {
+                color: white;
+            }
 		</style>
 		
-        <paper-button raised on-tap="_addCard"><iron-icon icon="icons:credit-card"></iron-icon>Add Card</paper-button>
+        <paper-button on-tap="_addCard" class="custom indigo"><iron-icon icon="icons:credit-card"></iron-icon>&nbsp;Add Card&nbsp;</paper-button>
 
 	</template>
 	<script>
