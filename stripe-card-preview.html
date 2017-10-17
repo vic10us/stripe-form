@@ -144,7 +144,7 @@
             }
             
 
-            .bs-ObjectList-cell([default='false']) {
+            .bs-ObjectList-cell([default-card='false']) {
                 display: none;
             }
 
@@ -210,7 +210,7 @@
 			<div class$="card-logo {{cardType}}">&nbsp;</div>
             <div class="last-four">&#9679;&#9679;&#9679;&#9679; {{lastFour}}</div>
 			<div class="expiry-date">{{expiryMonth}}/{{expiryYear}}</div>
-            <div hidden$="[[!default]]" class="bs-ObjectList-cell bs-u-right bs-u-shrink db-CardsList-cell-default">
+            <div hidden$="[[!defaultCard]]" class="bs-ObjectList-cell bs-u-right bs-u-shrink db-CardsList-cell-default">
                 <span class="bs-Badge bs-Badge--small bs-Badge--blue bs-Badge--solid">
                     Default
                 </span>
@@ -244,7 +244,7 @@
                     type: String,
                     value: 'unknown'
                 },
-                default: {
+                defaultCard: {
                     type: Boolean,
                     value: false
                 }
